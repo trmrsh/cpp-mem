@@ -1,3 +1,6 @@
 
 'mem' is a C++ implementation of the F77 code memsys.
 
+Installation order: mem
+
+See www.astro.warwick.ac.uk/people/marsh/software for further info.

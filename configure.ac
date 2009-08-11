@@ -8,7 +8,7 @@ AM_CONFIG_HEADER(config.h)
 
 dnl automake stuff
 
-AM_INIT_AUTOMAKE(mem, 1.0.0)
+AM_INIT_AUTOMAKE(mem, 1.0.1)
 
 AC_PROG_MAKE_SET
 
