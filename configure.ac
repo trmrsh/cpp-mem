@@ -8,7 +8,7 @@ AM_CONFIG_HEADER(config.h)
 
 dnl automake stuff
 
-AM_INIT_AUTOMAKE(mem, 1.0.1)
+AM_INIT_AUTOMAKE(mem, 1.0.2)
 
 AC_PROG_MAKE_SET
 
@@ -18,6 +18,7 @@ AC_PROG_CC
 
 dnl Initialise libtool
 AC_PROG_LIBTOOL
+AC_CONFIG_MACRO_DIR([m4])
 
 dnl Make C++ the default
 AC_LANG_CPLUSPLUS
