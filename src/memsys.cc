@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <iostream>
-#include "trm_subs.h"
+#include "trm/subs.h"
 
 namespace Mem {
 

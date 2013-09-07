@@ -1,7 +1,7 @@
 
 #include "../base/subs.h"
 #include "../base/graphics.h"
-#include "trm_memsys.h"
+#include "trm/memsys.h"
 
 const int NDATA = 200;
 float dat[NDATA];
