@@ -237,8 +237,9 @@ namespace Mem {
 
     void uwrite(const int i);
 
-    void memcore(const int mxbuf, const int nmod, const int ndat);
+    void memcore(size_t mxbuf, size_t nmod, size_t ndat);
 
+    size_t memsize(size_t nmod, size_t ndat);
 
     // Function definitions
 
@@ -3563,7 +3564,7 @@ namespace Mem {
 	} 
     }
 
-    void memcore(const int mxbuf, const int nmod, const int ndat){
+    void memcore(size_t mxbuf, size_t nmod, size_t ndat){
 
 	//  Formats memsys core buffer for images and data vectors
 	//
@@ -3582,7 +3583,7 @@ namespace Mem {
 	Gbl::nj = 1;
 	Gbl::mj = nmod;
 	int	njfile = 0;
-	int kore   = 0;
+	size_t kore = 0;
 
 	for(int i=0; i<40; i++) 
 	    Gbl::ka[i] = 0;
@@ -3592,10 +3593,10 @@ namespace Mem {
 	    if(jfile[i] >= 0){
 		njfile++;
 		Gbl::kb[i] = nmod*jfile[i];
-		kore = std::max(kore,Gbl::kb[i]);
+		kore = std::max(kore,size_t(Gbl::kb[i]));
 	    }
 	}
-	int korej = kore + nmod;
+	size_t korej = kore + nmod;
 
 	//  load data pointers
 
@@ -3607,7 +3608,7 @@ namespace Mem {
 	    if(kfile[i] >= 0){
 		nkfile++;
 		Gbl::kb[20+i] = korej + ndat*kfile[i];
-		kore = std::max(kore,Gbl::kb[20+i]);
+		kore = std::max(kore,size_t(Gbl::kb[20+i]));
 	    }
 	}
 	kore += ndat;
@@ -3618,6 +3619,46 @@ namespace Mem {
 	}
 	std::cerr << "Mem::memcore used " << 100.*float(kore)/mxbuf 
 		  << "% of " << mxbuf << " total buffer." << std::endl;
+    }
+
+    size_t memsize(size_t nmod, size_t ndat){
+
+	//  Formats memsys core buffer for images and data vectors
+	//
+	//  Input:
+	//	mxbuf = size of buffer
+	//	nmod  = size of images
+	//	ndat  = size of data
+	//
+
+	int jfile[20] = {0, 1, 2, 3, 4, 5, -1, -1, -1, -1, 
+			 -1, -1, -1, -1, -1, -1, -1, 8, 6, 7};
+
+	int kfile[20] = {0, 1, 2, 3, 4, 5, 6, 7, -1, -1, 
+			 -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+
+	int njfile = 0;
+	size_t kore = 0;
+
+	for(int i=0; i<20; i++){
+	    Gbl::kb[i]=-9999999;
+	    if(jfile[i] >= 0){
+		njfile++;
+		kore = std::max(kore,size_t(nmod*jfile[i]));
+	    }
+	}
+	size_t korej = kore + nmod;
+
+	//  load data pointers
+	int nkfile = 0;
+	for(int i=0; i<20; i++){
+	    if(kfile[i] >= 0){
+		nkfile++;
+                kore = std::max(kore,korej + size_t(ndat*kfile[i]));
+	    }
+	}
+	kore += ndat;
+        return kore;
     }
 }
 
