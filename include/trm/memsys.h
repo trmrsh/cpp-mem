@@ -25,7 +25,10 @@ namespace Mem {
     void tropus(const int k, const int l);
     
     //! Sets up the memory
-    void memcore(const int mxbuf, const int nmod, const int ndat);
+    void memcore(size_t mxbuf, size_t nmod, size_t ndat);
+
+    //! Computes buffer size needed 
+    size_t memsize(size_t nmod, size_t ndat);
     
 }
 

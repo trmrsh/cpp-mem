@@ -1,14 +1,13 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([src/memsys.cc])
+AC_INIT([mem], [1.0.3])
+
+AC_CONFIG_SRCDIR([src/memsys.cc])
+
+AM_INIT_AUTOMAKE
 
 dnl Get rid of all the -D stuff
-
-AM_CONFIG_HEADER(config.h)
-
-dnl automake stuff
-
-AM_INIT_AUTOMAKE(mem, 1.0.2)
+AM_CONFIG_HEADER([config.h])
 
 AC_PROG_MAKE_SET
 
@@ -16,9 +15,11 @@ dnl Compiler checks
 AC_PROG_CXX
 AC_PROG_CC
 
+dnl keep correct libtool macros in tree
+AC_CONFIG_MACRO_DIR([m4])
+
 dnl Initialise libtool
 AC_PROG_LIBTOOL
-AC_CONFIG_MACRO_DIR([m4])
 
 dnl Make C++ the default
 AC_LANG_CPLUSPLUS
@@ -31,5 +32,6 @@ dnl Installation program
 AC_PROG_INSTALL
 
 dnl The Makefiles to create
+AC_CONFIG_FILES([Makefile src/Makefile include/Makefile]) 
 
-AC_OUTPUT([Makefile src/Makefile include/Makefile]) 
+AC_OUTPUT

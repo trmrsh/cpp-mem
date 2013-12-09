@@ -4,13 +4,14 @@
 
 INCLUDES = -I../include
 
+LDADD = libmem.la
+
 ## Library
 
 lib_LTLIBRARIES = libmem.la 
 
-libmem_la_LDFLAGS = -static
-
 libmem_la_SOURCES = memsys.cc
 
+libmem_la_LDFLAGS = -version-info 1:0:0
 
 
