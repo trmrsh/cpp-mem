@@ -8,7 +8,7 @@ LDADD = libmem.la
 
 ## Library
 
-lib_LTLIBRARIES = libmem.la 
+lib_LTLIBRARIES = libmem.la
 
 libmem_la_SOURCES = memsys.cc
 
