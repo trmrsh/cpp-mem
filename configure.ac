@@ -32,6 +32,6 @@ dnl Installation program
 AC_PROG_INSTALL
 
 dnl The Makefiles to create
-AC_CONFIG_FILES([Makefile src/Makefile include/Makefile]) 
+AC_CONFIG_FILES([Makefile src/Makefile include/Makefile])
 
 AC_OUTPUT
