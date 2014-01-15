@@ -449,7 +449,7 @@ namespace Mem {
         //    (3)  areas <5> and <27> are workspace
         //
         //-----------------------------------------------------------------------
-  
+
         float sdd[6][6], cdd[6][6], w[6];
 
         meinit();
@@ -493,8 +493,8 @@ namespace Mem {
             exit(EXIT_FAILURE);
         }
 
-        if(Gbl::l0>=1) 
-            std::cerr << " mem december 1985  method = " << m4 << 
+        if(Gbl::l0>=1)
+            std::cerr << " mem december 1985  method = " << m4 <<
                 Gbl::m3 << m2 << m1 << Gbl::m0 << std::endl;
 
         // maximum entropy
@@ -502,7 +502,7 @@ namespace Mem {
         memex();
         mema(acc, c);
         if(Gbl::l1>=1) std::cerr << "       " <<
-                           "                                            C    === " 
+                           "                                            C    === "
                                  << c << std::endl;
         memtr(27,5);
         float sdef;
@@ -607,7 +607,7 @@ namespace Mem {
         //
 
         if(Gbl::l0>=1) std::cerr << " mema" << std::endl;
-    
+
         // set x = twice (6 * rmsresidual )**2  (or infinity if not needed)
 
         float x;
@@ -659,8 +659,8 @@ namespace Mem {
         }
         x += z1;
     }
- 
-    void mema1(int mk, const float d[], const float f[], const int m2, const float e[], 
+
+    void mema1(int mk, const float d[], const float f[], const int m2, const float e[],
                const float acc, const float x, float gc[], float &c){
         float z1=0., a, r, y;
 
@@ -682,9 +682,9 @@ namespace Mem {
         }
         c += z1;
     }
- 
- 
-    void memb(const float def, float sdd[6][6], float &s, float &sdef, 
+
+
+    void memb(const float def, float sdd[6][6], float &s, float &sdef,
               float &test){
 
         // purpose:
