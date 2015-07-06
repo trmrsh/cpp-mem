@@ -7,7 +7,6 @@
 #include <cstdlib>
 #include <cmath>
 #include <iostream>
-#include "trm/subs.h"
 
 namespace Mem {
 
@@ -508,7 +507,7 @@ namespace Mem {
         float sdef;
         memb(def, sdd, s, sdef, test);
         sumf=sdd[0][0];
-        if(Gbl::l1>=1) 
+        if(Gbl::l1>=1)
             std::cerr << "      S    === " << s << "    TEST === " << test << std::endl;
         memop(1,23);
         memop(2,24);
@@ -526,11 +525,11 @@ namespace Mem {
         meml(4,sdd,cdd,s,c,aim,rmax,sdef,snew,cnew,rnew,w);
         float speed=rnew/3.;
         if(Gbl::l1>=2)
-            std::cerr << "      SNEW === " << snew << "    DIST === " << rnew 
+            std::cerr << "      SNEW === " << snew << "    DIST === " << rnew
                       << "    CNEW === " << cnew << std::endl;
         if(speed<speed0 || Gbl::m0==3){
             if(Gbl::l1==1)
-                std::cerr << "      SNEW === " << snew << "    DIST === " << rnew 
+                std::cerr << "      SNEW === " << snew << "    DIST === " << rnew
                           << "    CNEW === " << cnew << std::endl;
             memf(w,sumf);
             return;
@@ -548,11 +547,11 @@ namespace Mem {
             ndir++;
             speed=rnew/float(ndir);
             if(Gbl::l1>=2)
-                std::cerr << "      SNEW === " << snew << "    DIST === " << rnew 
+                std::cerr << "      SNEW === " << snew << "    DIST === " << rnew
                           << "    CNEW === " << cnew << std::endl;
             if(speed<speed0 || Gbl::m0==4){
                 if(Gbl::l1==1)
-                    std::cerr << "      SNEW === " << snew << "    DIST === " << rnew 
+                    std::cerr << "      SNEW === " << snew << "    DIST === " << rnew
                               << "    CNEW === " << cnew << std::endl;
                 memff(w,sumf);
                 return;
@@ -633,7 +632,7 @@ namespace Mem {
             uread(22);
             if(Gbl::m20==0) uread(21);
             mema1(Gbl::mk, Gbl::st+Gbl::kc[20], Gbl::st+Gbl::kc[22],
-                  Gbl::m20, Gbl::st+Gbl::kc[21], acc, x, 
+                  Gbl::m20, Gbl::st+Gbl::kc[21], acc, x,
                   Gbl::st+Gbl::kc[27], c);
             uwrite(27);
         }
@@ -642,7 +641,7 @@ namespace Mem {
         return;
     }
 
-    void mema0(const int mk, const float d[], const float f[], const int m2, 
+    void mema0(const int mk, const float d[], const float f[], const int m2,
                const float e[], const float acc, float &x){
         float a, r;
         float z1=0.;
@@ -762,14 +761,14 @@ namespace Mem {
         sdd[1][1]=0.;
         sdd[1][2]=0.;
         sdd[2][2]=0.;
-  
+
         for(int i=0; i<Gbl::nj; i++){
             uread(0);
             uread(5);
             if(Gbl::m10==3) uread(19);
             if(Gbl::m3 ==1) uread(18);
             memb1(Gbl::mj, Gbl::st+Gbl::kc[0], Gbl::st+Gbl::kc[5],
-                  Gbl::m3, Gbl::st+Gbl::kc[18], Gbl::m10, 
+                  Gbl::m3, Gbl::st+Gbl::kc[18], Gbl::m10,
                   Gbl::st+Gbl::kc[19], defa, Gbl::st+Gbl::kc[1],
                   Gbl::st+Gbl::kc[2], sdef,
                   sdd[0][0],sdd[0][1],sdd[0][2],sdd[1][1],sdd[1][2],sdd[2][2]);
@@ -789,6 +788,11 @@ namespace Mem {
             sc=sdd[1][2]-0.99999*sdd[0][1]*sdd[0][2]/sdd[0][0];
             cc=sdd[2][2]-0.99999*sdd[0][2]*sdd[0][2]/sdd[0][0];
         }
+        std::cerr << "[1][2], [0][1], [0][2], [0][0] = "
+                  << sdd[1][2] << ", " << sdd[0][1] << ", " << sdd[0][2] << ", "
+                  << sdd[0][0] << std::endl;
+        std::cerr << "sc,ss,cc = " << sc << ", " << ss << ", " << cc << std::endl;
+
         test=1.-sc/(sqrt(ss+1.e-35)*sqrt(cc+1.e-35));
         return;
     }
@@ -850,7 +854,27 @@ namespace Mem {
             z6  += y*gc[i];
             fgs[i] = x;
             fgc[i] = y;
+            if(std::abs(gs) > 1.e25 || std::abs(gc[i]) > 1.e25 || std::abs(y) > 1.e25){
+                std::cerr << "weight,x,y,gs,gc,i,deflt,f="
+                          << weight << ", " 
+                          << x << ", " 
+                          << y << ", " 
+                          << gs << ", " 
+                          << gc[i] << ", " 
+                          << i << ", " 
+                          << deflt << ", " 
+                          << f[i] << std::endl;
+            }
         }
+        std::cerr << "z0,z1,z2,z3,z4,z5,z6 = "
+                  << z0 << ", " 
+                  << z1 << ", " 
+                  << z2 << ", " 
+                  << z3 << ", " 
+                  << z4 << ", " 
+                  << z5 << ", " 
+                  << z6 << std::endl; 
+
         sdef += z0;
         s11  += z1;
         s12  += z2;
@@ -2501,7 +2525,7 @@ namespace Mem {
         int lmax = int(t+2.0);
 
         int n = nd-1;
-    
+
         // outer loop over n for successively smaller eigenvalues
 
         for(;;){
@@ -2848,12 +2872,12 @@ namespace Mem {
         //
 
         // set extreme values
-    
+
         double cmin=std::min(c,caim);
         double cmax=std::max(c,caim);
 
         // revise eigenvalues by distance penalty
-    
+
         double e[6];
         for(int k=0; k<ndim; k++)
             e[k] = std::max( eval[k]+p ,0.0e0);
@@ -2869,8 +2893,8 @@ namespace Mem {
             al=(2.0*a1*(a2/al)+a1+a2)/(2.0+(a1+a2)/al);
             da=a2-a1;
 
-            // solve b(..)x(.)=gq(.) for x(.) and
-            //  get corresponding new statistics cnew, cpen and squared-distance d2s
+            // solve b(..)x(.)=gq(.) for x(.) and get corresponding new
+            // statistics cnew, cpen and squared-distance d2s
 
             d2s=0.0;
             cpen=c;
@@ -2887,7 +2911,8 @@ namespace Mem {
 
             if( cpen > cmax || (cnew > cmin && (d2s-rates)*(c-caim)<=0.0)){
 
-                // reduce alpha and store upper limit in a2 if distance is acceptable
+                // reduce alpha and store upper limit in a2 if distance is
+                // acceptable
 
                 a2=al;
                 if(d2s<=rates) aa=al;
@@ -2905,8 +2930,7 @@ namespace Mem {
         //
         // exit with aa=a2 if the result is within the distance limit
     }
- 
- 
+
     void meml6(const int nsrch, const int ndim, const double gsd[6],
                const double gcd[6], const double eval[6],
                const double vecu[6][6], const double s,
@@ -2914,7 +2938,7 @@ namespace Mem {
                double gqd[6], double xu[6], double w[6],
                double& snew, double& cnew, double& cpen,
                double& d2s){
-    
+
         //
         // purpose:
         //   transfer solution back to original coordinates
@@ -3008,10 +3032,9 @@ namespace Mem {
 
         w[0] = -x/sdd[0][0];
     }
- 
- 
+
     void meml7(const int nsrch, const double w[6], const double snew,
-               const double cnew, const double d2s, const float sdefa, 
+               const double cnew, const double d2s, const float sdefa,
                float wa[6], float &snewa, float &cnewa,
                float &rnewa){
 
@@ -3141,8 +3164,7 @@ namespace Mem {
         std::cerr << std::endl;
         return;
     }
- 
- 
+
     void uread(const int i){
 
         //
@@ -3435,7 +3457,7 @@ namespace Mem {
         //    read(k) x;
         std::cerr << "uget: SHOULD NOT BE HERE" << std::endl;
     }
- 
+
     void uput(const int i, float x[], const int m){
 
         //
@@ -3467,7 +3489,7 @@ namespace Mem {
         //      write(k) x
         std::cerr << "uput: SHOULD NOT BE HERE" << std::endl;
     }
- 
+
     void uwind(const int i){
 
         //
@@ -3497,8 +3519,7 @@ namespace Mem {
         //      rewind k
         std::cerr << "uwind: SHOULD NOT BE HERE" << std::endl;
     }
-  
- 
+
     void udiag(){
 
         //
@@ -3549,7 +3570,7 @@ namespace Mem {
                 std::cerr << "ka = " << Gbl::ka[n] << " (core file) ";
             }
             std::cerr << Gbl::kb[n] << " base address" << std::endl;
-      
+
             std::cerr << "                    " << Gbl::kb[n]+m-1 << " last address "
                       << std::endl;
             std::cerr << " first point ?  ";
@@ -3649,7 +3670,7 @@ namespace Mem {
         }
         size_t korej = kore + nmod;
 
-        //  load data pointers
+        // load data pointers
         int nkfile = 0;
         for(int i=0; i<20; i++){
             if(kfile[i] >= 0){
