@@ -17,7 +17,7 @@ namespace Mem {
         extern int nj,mj,nk,mk,ka[40],kb[40],kc[40],kd[40];
         extern int l0,l1,m0,m10,m11,m20,m21,m3;
         extern float *st;
-        extern char pr[40];
+        extern char pr[41];
     }
 
     // Function declarations.
@@ -247,38 +247,40 @@ namespace Mem {
                 const float rmax, const float def, const float acc,
                 float &c, float &test, float &cnew, float &s,
                 float &rnew, float &snew, float &sumf){
-        //                                                                      *
-        //                  --------------------------------                    *
-        //                  "memsys"  maximum entropy system                    *
-        //                  --------------------------------                    *
-        //                                                                      *
-        //               John Skilling                                          *
-        //               dept. applied maths. and theoretical physics           *
-        //               silver street, cambridge, england                      *
-        //                                                                      *
-        //         (c)   copyright 1985                                         *
-        //               maximum entropy data consultants ltd                   *
-        //               33 north end, meldreth, royston, england               *
-        // **********************************************************************
+        //                                                                  *
+        //                  --------------------------------                *
+        //                  "memsys"  maximum entropy system                *
+        //                  --------------------------------                *
+        //                                                                  *
+        //               John Skilling                                      *
+        //               dept. applied maths. and theoretical physics       *
+        //               silver street, cambridge, england                  *
+        //                                                                  *
+        //         (c)   copyright 1985                                     *
+        //               maximum entropy data consultants ltd               *
+        //               33 north end, meldreth, royston, england           *
+        // ******************************************************************
         //
         // purpose:
         //   perform one iterate of maximum entropy and update map
         //
-        //   enter with      <0> = map f  ,  <20> = data d
+        //   enter with <0> = map f, <20> = data d
         //
-        //   and optionally
-        //           <19> = default model ,  <18> = weights ,  <21> = accuracies
+        //   and optionally:
         //
-        //   exit with       <0> = new map .
+        //        <19> = default model ,  <18> = weights,
+        //        <21> = accuracies = (2/variances)
         //
-        // **********************************************************************
+        //   exit with <0> = new map.
         //
-        //   entropy    s  :=  - 1 - total( <0> * log <0>/e<19> ) / total<19>
+        // ******************************************************************
         //
-        //                                         2
-        //   constraint c  :=  sum (opus<0> - <20>)  * <21> / 2
+        //   entropy s := -1 - total( <0> * log <0>/e<19> ) / total<19>
         //
-        // **********************************************************************
+        //
+        //   constraint c :=  sum (opus<0> - <20>)**2  * <21> / 2
+        //
+        // ******************************************************************
         // parameters:
         //   argument type  i/o  dimension   description
         //
@@ -308,8 +310,8 @@ namespace Mem {
         //
         //    Gbl::ka     mecomp     i    allocation pointers for areas
         //    Gbl::kb     mecomp     i    base addresses in core for buffers
-        //    Gbl::kc     mecomp      (o) core addresses for current buffers
-        //    Gbl::kd     mecomp      (o) disc or upper core addresses of buffers
+        //    Gbl::kc     mecomp     (o) core addresses for current buffers
+        //    Gbl::kd     mecomp     (o) disc or upper core addresses of buffers
         //
         //    Gbl::iin    mecomp     i    fortran stream for user input (if any)
         //
@@ -383,8 +385,10 @@ namespace Mem {
         //
         //        Gbl::l1 = 0 gives no numerical diagnostics
         //        Gbl::l1 = 1 gives s,test,c and snew,rnew,cnew
-        //        Gbl::l1 = 2 gives additionally snew,rnew,cnew in each minor loop
-        //        Gbl::l1 = 3 gives additionally technical diagnostics from "control"
+        //        Gbl::l1 = 2 gives additionally snew,rnew,cnew in each minor
+        //                    loop
+        //        Gbl::l1 = 3 gives additionally technical diagnostics from
+        //                    "control"
         //        Gbl::l1 = 4 gives additionally the subspace scalars
         //
         //
@@ -498,24 +502,40 @@ namespace Mem {
 
         // maximum entropy
 
+        // Next line carries out first model --> data opus comp.
+        // Stores result in <22>
         memex();
+
+        // Computes c = reduced chi**2, and residual vector <27> =
+        // <21>*(<22>-<20>) (i.e "accuracies" times (predicted data - data))
         mema(acc, c);
         if(Gbl::l1>=1) std::cerr << "       " <<
                            "                                            C    === "
                                  << c << std::endl;
+
+        // Applies tropus to <27> --> <5>. <5> thus contains the chi**2
+        // gradient one-form
         memtr(27,5);
+
         float sdef;
+        // Computes the entropy and chi**2 gradient vectors which are stored
+        // in <1> and <2>. These are the basic search directions for the
+        // algorithm called f(grad(S)) and f(grad(C)) in Skilling & Bryan
+        // they are called fgs and fgc in memb1
         memb(def, sdd, s, sdef, test);
+
         sumf=sdd[0][0];
         if(Gbl::l1>=1)
             std::cerr << "      S    === " << s << "    TEST === " << test << std::endl;
         memop(1,23);
         memop(2,24);
+
+        // memc computes quadratic part of chi**2 sub-space
         memc(acc, cdd);
         meml(3,sdd,cdd,s,c,aim,rmax,sdef,snew,cnew,rnew,w);
         float speed0=rnew/2.;
-        if(Gbl::l1>=2) 
-            std::cerr << "      SNEW === " << snew << "    DIST === " << rnew 
+        if(Gbl::l1>=2)
+            std::cerr << "      SNEW === " << snew << "    DIST === " << rnew
                       << "    CNEW === " << cnew << std::endl;
         memcc(acc,w);
         memtr(27,5);
@@ -570,7 +590,6 @@ namespace Mem {
         }
     }
 
-
     void mema(const float acc , float &c){
 
         // purpose:
@@ -582,7 +601,7 @@ namespace Mem {
         //
         // parameters:
         //   argument type  i/o  dimension   description
-        //    acc     r    (i)     -         accuracy (alternative to <22>)
+        //    acc     r    (i)     -         accuracy (alternative to <21>)
         //    c       r       o    -         constraint value
         //
         // globals:
@@ -661,6 +680,7 @@ namespace Mem {
 
     void mema1(int mk, const float d[], const float f[], const int m2, const float e[],
                const float acc, const float x, float gc[], float &c){
+        // comes back with c = 2*(reduced chi-squared), gc=2*(f-d)/sigma**2/ndata
         float z1=0., a, r, y;
 
         for(int i=0; i<mk; i++){
@@ -698,9 +718,9 @@ namespace Mem {
         //
         //           <2> := <5> * metric
         //
-        //         sdd   := <i> * <j> / metric     for     ij = 00,01,02,11,12,22
+        //         sdd   := <i> * <j> / metric for ij = 00,01,02,11,12,22
         //
-        //         total<i> = sum( <i> * <18> )     ,    metric = <0> / <18>
+        //         total<i> = sum( <i> * <18> ), metric = <0> / <18>
         //
         //
         // parameters:
@@ -788,10 +808,6 @@ namespace Mem {
             sc=sdd[1][2]-0.99999*sdd[0][1]*sdd[0][2]/sdd[0][0];
             cc=sdd[2][2]-0.99999*sdd[0][2]*sdd[0][2]/sdd[0][0];
         }
-        std::cerr << "[1][2], [0][1], [0][2], [0][0] = "
-                  << sdd[1][2] << ", " << sdd[0][1] << ", " << sdd[0][2] << ", "
-                  << sdd[0][0] << std::endl;
-        std::cerr << "sc,ss,cc = " << sc << ", " << ss << ", " << cc << std::endl;
 
         test=1.-sc/(sqrt(ss+1.e-35)*sqrt(cc+1.e-35));
         return;
@@ -843,6 +859,8 @@ namespace Mem {
                 gs=0.;
             }
             amet = f[i]/weight;
+            // x,y are the contra-variant components of the entropy and chi**2
+            // gradients
             x    = amet*gs;
             y    = amet*gc[i];
             z0  += weight*deflt;
@@ -856,24 +874,16 @@ namespace Mem {
             fgc[i] = y;
             if(std::abs(gs) > 1.e25 || std::abs(gc[i]) > 1.e25 || std::abs(y) > 1.e25){
                 std::cerr << "weight,x,y,gs,gc,i,deflt,f="
-                          << weight << ", " 
-                          << x << ", " 
-                          << y << ", " 
-                          << gs << ", " 
-                          << gc[i] << ", " 
-                          << i << ", " 
-                          << deflt << ", " 
+                          << weight << ", "
+                          << x << ", "
+                          << y << ", "
+                          << gs << ", "
+                          << gc[i] << ", "
+                          << i << ", "
+                          << deflt << ", "
                           << f[i] << std::endl;
             }
         }
-        std::cerr << "z0,z1,z2,z3,z4,z5,z6 = "
-                  << z0 << ", " 
-                  << z1 << ", " 
-                  << z2 << ", " 
-                  << z3 << ", " 
-                  << z4 << ", " 
-                  << z5 << ", " 
-                  << z6 << std::endl; 
 
         sdef += z0;
         s11  += z1;
@@ -1885,12 +1895,12 @@ namespace Mem {
         //
         //                 <22> :=  actual opus transform <0>
         //
-        // linear experiments are treated by a call to the differential response
-        //   routine opus.
+        // linear experiments are treated by a call to the
+        //   differential response routine opus.
         //
-        // nonlinear experiments should transform an image on area 0 to mock data
-        // on file 22, and may possibly need to adjust area 20, area 21,
-        // and the required value of c.
+        // nonlinear experiments should transform an image on area 0
+        // to mock data on file 22, and may possibly need to adjust
+        // area 20, area 21, and the required value of c.
         //
         //
         // parameters:
@@ -1914,7 +1924,7 @@ namespace Mem {
         memop(0,22);
 
     }
- 
+
     void memop(const int k, const int l){
 
         // purpose:
@@ -1941,17 +1951,15 @@ namespace Mem {
         // notes:
         //
 
-        if(Gbl::l0>=1) std::cerr << "   opus" << std::endl;
         Gbl::pr[k] = 'r';
         Gbl::pr[l] = 'w';
 
         opus(k,l);
 
         // re-initialise to protect the user
-
         uinit();
     }
- 
+
     void memtr(const int k, const int l){
 
         // purpose:
@@ -1977,17 +1985,15 @@ namespace Mem {
         //
         // notes:
 
-        if(Gbl::l0>=1) std::cerr << "   tropus" << std::endl;
         Gbl::pr[k] = 'r';
         Gbl::pr[l] = 'w';
 
         tropus(k,l);
 
         // re-initialise to protect the user
-
         uinit();
-    } 
- 
+    }
+
     void meml(const int nsrch, const float sdda[6][6], 
               const float cdda[6][6], const float sa, 
               const float ca, const float aima, 
@@ -2082,6 +2088,7 @@ namespace Mem {
         // k = first relevant search direction
 
         int k = Gbl::m11;
+        std::cerr << "meml: k = " << k << std::endl;
 
         // copy to internal (double precision) variables
 
@@ -2395,14 +2402,18 @@ namespace Mem {
                 w1[i][j] /= sqrt(sval[i+l])*sqrt(sval[j+l]);
 
         // cdd=w1 eigenvalues cval and eigenvectors w2
-
-        meml33(ndim,w1,cval,w2);
+         meml33(ndim,w1,cval,w2);
 
         // complete squeeze of w2 back to sdd eigenvector space
-
         for(int i=0; i<ndim; i++)
             for(int j=0; j<ndim; j++)
                 w2[i][j] /= sqrt(sval[i+l]);
+
+        std::cerr << "squeezed ws" << std::endl;
+        std::cerr << w2[0][0] << " " << w2[0][1] << " " << w2[0][2] << std::endl;
+        std::cerr << w2[1][0] << " " << w2[1][1] << " " << w2[1][2] << std::endl;
+        std::cerr << w2[2][0] << " " << w2[2][1] << " " << w2[2][2] << std::endl;
+
 
         // rotate w2 to original space
 
@@ -2478,7 +2489,7 @@ namespace Mem {
         //
         // notes:
         //   (1) eigenvalues val are returned in increasing order
-        //   (2) eigenvectors vec are normalised to v.amat.v=1
+        //   (2) eigenvectors vec are normalised to v.v=1
         //   (3) input matrix amat is preserved
         //   (4) only the upper triangle j>i of amat(i,j) is read
         //
@@ -3191,9 +3202,6 @@ namespace Mem {
         // history:
         //   john skilling    8 nov 1985     initial release
         //
-        // notes:
-        //    (1) use update instead of uread if area to be modified in-place
-        //
 
         Gbl::pr[i] = 'r';
         int m;
@@ -3216,57 +3224,6 @@ namespace Mem {
             Gbl::kc[i] = Gbl::kd[i];
             Gbl::kd[i] = Gbl::kd[i]+m;
         }
-    }
-
-    void update(const int i){
-
-        //
-        // purpose:
-        //   read a buffer from given area, ready for in-place writing
-        //
-        // parameters:
-        //   argument type  i/o  dimension   description
-        //    i       i     i      -         input area number
-        //
-        // globals:
-        //   variable  common block  i/o  description
-        //    st          mecoms       o  storage vector
-        //    mj,mk       mecomp     i    buffer sizes (map and data space)
-        //    ka          mecomp     i    allocation pointers
-        //    kb          mecomp      -   base addresses
-        //    kc          mecomp     i    core addresses
-        //    kd          mecomp      -   disc or upper core addresses
-        //    pr          mecomc       o  read/write flags
-        //
-        // external calls:
-        //    uget        get buffer from disc
-        //
-        // history:
-        //   john skilling    8 nov 1985     initial release
-        //
-        // notes:
-        //    (1) update will not work on sequential access disc files
-        //    (2) use uread instead of update if area is read-only
-        //
-
-        int m;
-        Gbl::pr[i]='u';
-        if(i < 20){
-            m = Gbl::mj;
-        }else{
-            m = Gbl::mk;
-        }
-
-        // disc
-
-        if(Gbl::ka[i]>0) {
-            //      uget(i,Gbl::st+Gbl::kc[i],m);
-            std::cerr << "Disc I/O not enabled" << std::endl;
-            exit(EXIT_FAILURE);
-        }
-
-        // core
-
     }
 
     void uwrite(const int i){
@@ -3381,6 +3338,7 @@ namespace Mem {
             Gbl::pr[i]= '.';
             ureset(i);
         }
+        Gbl::pr[40] = 0;
     }
 
     void ureset(const int i){
