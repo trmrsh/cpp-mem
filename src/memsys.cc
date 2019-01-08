@@ -1994,11 +1994,11 @@ namespace Mem {
         uinit();
     }
 
-    void meml(const int nsrch, const float sdda[6][6], 
-              const float cdda[6][6], const float sa, 
-              const float ca, const float aima, 
+    void meml(const int nsrch, const float sdda[6][6],
+              const float cdda[6][6], const float sa,
+              const float ca, const float aima,
               const float rmaxa, const float sdefa,
-              float &snewa, float &cnewa, float &rnewa, 
+              float &snewa, float &cnewa, float &rnewa,
               float wa[6]){
 
         // purpose:
@@ -2088,7 +2088,6 @@ namespace Mem {
         // k = first relevant search direction
 
         int k = Gbl::m11;
-        std::cerr << "meml: k = " << k << std::endl;
 
         // copy to internal (double precision) variables
 
@@ -2230,27 +2229,25 @@ namespace Mem {
         //
 
         std::cerr << " gsd0";
-        for(int j=0;j<nsrch;j++){
+        for(int j=0;j<nsrch;j++)
             std::cerr << " " << gsd0[j];
-        }
         std::cerr << std::endl;
+
         std::cerr << " gcd0";
-        for(int j=0;j<nsrch;j++){
+        for(int j=0;j<nsrch;j++)
             std::cerr << " " << gcd0[j];
-        }
         std::cerr << std::endl;
+
         for(int i=0;i<nsrch;i++){
             std::cerr << " sdd";
-            for(int j=0;j<nsrch;j++){
+            for(int j=0;j<nsrch;j++)
                 std::cerr << " " << sdd[i][j];
-            }
             std::cerr << std::endl;
         }
         for(int i=0;i<nsrch;i++){
             std::cerr << " cdd";
-            for(int j=0;j<nsrch;j++){
+            for(int j=0;j<nsrch;j++)
                 std::cerr << " " << cdd[i][j];
-            }
             std::cerr << std::endl;
         }
     }
@@ -2402,21 +2399,14 @@ namespace Mem {
                 w1[i][j] /= sqrt(sval[i+l])*sqrt(sval[j+l]);
 
         // cdd=w1 eigenvalues cval and eigenvectors w2
-         meml33(ndim,w1,cval,w2);
+        meml33(ndim,w1,cval,w2);
 
         // complete squeeze of w2 back to sdd eigenvector space
         for(int i=0; i<ndim; i++)
             for(int j=0; j<ndim; j++)
                 w2[i][j] /= sqrt(sval[i+l]);
 
-        std::cerr << "squeezed ws" << std::endl;
-        std::cerr << w2[0][0] << " " << w2[0][1] << " " << w2[0][2] << std::endl;
-        std::cerr << w2[1][0] << " " << w2[1][1] << " " << w2[1][2] << std::endl;
-        std::cerr << w2[2][0] << " " << w2[2][1] << " " << w2[2][2] << std::endl;
-
-
         // rotate w2 to original space
-
         for(int j=0; j<ndim; j++){
             for(int i=0; i<nsrch; i++){
                 x=0.0;
@@ -2499,15 +2489,24 @@ namespace Mem {
         //       this nd**4 algorithm would be too slow for large matrices,
         //       but is robust for small.
         //
+        // NB TRM: I don't believe the docs are quite right here: this
+        // routine starts by adding a constant times the identity
+        // matrix to the input matrix to ensure that the result is
+        // positive definite. It does so even if the input is already
+        // positive definite. The answers returned are the eigenvalues
+        // and vectors of this modified matrix, but with the
+        // eigenvalues corrected back by the applied constant. I don't
+        // understand the rationale behind the constant chosen
+        // (04/01/2019), but it is probably one of those slightly
+        // heuristic procedures associated with names like Powell,
+        // Fletcher etc. It's a bit odd though.
 
         double c, z[6][6], p[6][6], q[6][6], y[6], x[6];
 
         // eps is related to machine accuracy
-
         const double eps=3.0e-16;
 
         // copy amat to a positive definite matrix z (by adding c to eigenvals)
-
         double a=0.0, b=0.0, t=0.0;
         for(int i=0; i<nd; i++){
             a += amat[i][i];
@@ -2595,7 +2594,7 @@ namespace Mem {
                 a=0.0;
                 for(int j=0; j<nd; j++)
                     a += p[i][j]*p[j][k];
-	
+
                 if(fabs(a) < 1.0e-18) a=0.0;
                 y[i]=a;
             }
@@ -2653,14 +2652,15 @@ namespace Mem {
                     a += z[i][j]*b;
                 }
             }
+            // note the addition of the constant 'c' at this
+            // point -- means the eigenvectors do not match
+            // the eigen values
             val[n] = a+c;
 
             // finish ?   (if full set of eigenvectors has been found)
-
-            if(--n < 0) return;
+            if(--n < 0)  return;
 
             // otherwise, remove dyadic  x.xtranspose  from matrix z
-
             for(int i=0; i<nd; i++){
                 for(int j=i; j<nd; j++){
                     b =x[i]*x[j];
