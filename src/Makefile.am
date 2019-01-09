@@ -2,7 +2,7 @@
 ##
 ## This is the file that must be edited if you are changing anything in the source directory
 
-INCLUDES = -I../include
+AM_CPPFLAGS = -I../include
 
 LDADD = libmem.la
 
