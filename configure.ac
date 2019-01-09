@@ -26,7 +26,7 @@ AC_LANG_CPLUSPLUS
 AC_REQUIRE_CPP
 
 dnl Check for some header files.
-AC_CHECK_HEADERS([stdlib.h float.h math.h sstream string fstream iostream], [], AC_MSG_ERROR(missing header; please fix))
+AC_CHECK_HEADERS([stdlib.h float.h math.h sstream string fstream iostream], [], [AC_MSG_ERROR(missing header; please fix)])
 
 dnl Installation program
 AC_PROG_INSTALL
